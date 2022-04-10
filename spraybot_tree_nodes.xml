@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<root>
+  <TreeNodesModel>
+
+    <Action ID="NextGoal">
+        <input_port name="input_goals">Destinations to plan through</input_port>
+        <output_port name="goal">Destination to plan to</output_port>
+        <output_port name="output_goals">Destinations to plan through, with current goal removed</output_port>   
+    </Action>
+
+    <Action ID="ConvertLL2Goal">
+      <input_port name="ll_goal">Input goal in geographic coordinates</input_port>
+      <output_port name="goal">Output goal in local coordinates</output_port>
+    </Action>
+
+    <Action ID="PublishGoal">
+      <input_port default="base_link" name="frame">Frame name to give goal in</input_port>
+      <input_port default="0.0; -1.5;0.0" name="goal_pose">Goal pose vector (x; y; z)</input_port>
+    </Action>
+
+    <Action ID="PublishString">
+        <input_port default="test" name="string_value">String value</input_port>
+        <input_port default="/test_string" name="topic_name">String topic name</input_port>
+    </Action>
+
+    <Action ID="TransitionLifecycleNode">
+      <input_port name="server_timeout">Service call timeout (milliseconds)</input_port>
+      <input_port name="service_name">Name of the change_state service</input_port>
+      <input_port name="transition_label">Transition name: create/configure/activate/deactivate/cleanup</input_port>
+    </Action>
+
+    <Condition ID="TopicStatus">
+      <input_port default="false" name="inital_status">Initial status</input_port>
+      <input_port default="status" name="topic_name">Status topic name</input_port>
+    </Condition>
+
+    <Decorator ID="TickRateLimiter">
+      <input_port default="10.0" name="hz">Rate</input_port>
+    </Decorator>
+  
+  </TreeNodesModel>
+</root>
