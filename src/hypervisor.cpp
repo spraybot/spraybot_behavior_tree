@@ -68,6 +68,15 @@ Hypervisor::Hypervisor(const std::string & node_name)
 nav2_util::CallbackReturn Hypervisor::on_configure(const rclcpp_lifecycle::State &)
 {
   RCLCPP_INFO(logger_, "Configuring %s", node_name_.c_str());
+
+    tf_ = std::make_shared<tf2_ros::Buffer>(get_clock());
+  // TODO: (shrijitsingh99) Look into timer interface for tf buffer
+  // auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
+  //   get_node_base_interface(), get_node_timers_interface());
+  // tf_->setCreateTimerInterface(timer_interface);
+  tf_->setUsingDedicatedThread(true);
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_);
+
   std::string client_node_name = node_name_;
   std::replace(client_node_name.begin(), client_node_name.end(), '/', '_');
   // Use suffix '_rclcpp_node' to keep parameter file consistency #1773
@@ -78,13 +87,6 @@ nav2_util::CallbackReturn Hypervisor::on_configure(const rclcpp_lifecycle::State
       "--"});
 
   client_node_ = std::make_shared<rclcpp::Node>("_", options);
-
-  tf_ = std::make_shared<tf2_ros::Buffer>(get_clock());
-  auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
-    get_node_base_interface(), get_node_timers_interface());
-  tf_->setCreateTimerInterface(timer_interface);
-  tf_->setUsingDedicatedThread(true);
-  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_, this, false);
 
   // Declare this node's parameters
   if (!has_parameter("bt_loop_duration")) {
