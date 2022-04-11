@@ -14,8 +14,9 @@
     </Action>
 
     <Action ID="PublishGoal">
-      <input_port default="base_link" name="frame">Frame name to give goal in</input_port>
-      <input_port default="0.0; -1.5;0.0" name="goal_pose">Goal pose vector (x; y; z)</input_port>
+      <input_port default="base_link" name="goal_frame">Frame goal pose is defined in</input_port>
+      <input_port default="0.0; 0.0;0.0" name="goal_pose">Goal pose vector (x; y; z)</input_port>
+      <input_port default="map" name="publishing_frame">Frame to convert goal into before publishing</input_port>
     </Action>
 
     <Action ID="PublishString">

@@ -8,8 +8,12 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include "nav2_util/robot_utils.hpp"
+#include <tf2/time.h>
+
 #include "spraybot_behavior_tree/plugins/publish_goal.hpp"
 
+using namespace std::chrono_literals;
 namespace spraybot_behavior_tree
 {
 
@@ -19,7 +23,7 @@ PublishGoal::PublishGoal(
 : BT::ActionNodeBase(xml_tag_name, conf)
 {
   node_ = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
-  config().blackboard->get<rclcpp::Node::SharedPtr>("node");
+  tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
 
   rclcpp::PublisherOptions pub_option;
   goal_pub_ = node_->create_publisher<geometry_msgs::msg::PoseStamped>(
@@ -37,12 +41,12 @@ PublishGoal::~PublishGoal()
 
 BT::NodeStatus PublishGoal::tick()
 {
-  geometry_msgs::msg::PoseStamped msg;
+  geometry_msgs::msg::PoseStamped msg, msg_transformed;
   msg.header.stamp = node_->now();
 
-  std::string frame_name;
-  getInput("frame", frame_name);
-  msg.header.frame_id = frame_name;
+  std::string goal_frame;
+  getInput("goal_frame", goal_frame);
+  msg.header.frame_id = goal_frame;
 
   std::vector<double> goal_pose;
   getInput("goal_pose", goal_pose);
@@ -53,7 +57,13 @@ BT::NodeStatus PublishGoal::tick()
   msg.pose.position.x = goal_pose[0];
   msg.pose.position.y = goal_pose[1];
   msg.pose.orientation = tf2::toMsg(q);
-  goal_pub_->publish(msg);
+
+  std::string publishing_frame;
+  getInput("publishing_frame", publishing_frame);
+  tf_->lookupTransform(publishing_frame, goal_frame, tf2::TimePointZero, 1000ms);
+  nav2_util::transformPoseInTargetFrame(msg, msg_transformed, *tf_, publishing_frame);
+
+  goal_pub_->publish(msg_transformed);
 
   return BT::NodeStatus::SUCCESS;
 }

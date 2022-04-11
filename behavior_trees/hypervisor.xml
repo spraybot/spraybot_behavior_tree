@@ -15,7 +15,7 @@
                                 <Action ID="PublishString" string_value="RowTurning" topic_name="/planner_selection"/>
                             </SequenceStar>
                         </Delay>
-                        <Action ID="PublishGoal" frame="base_link" goal_pose="0.0; -1.5;3.14"/>
+                        <Action ID="PublishGoal" goal_frame="base_link" goal_pose="0.0; -1.5;3.14" publishing_frame="map"/>
                     </SequenceStar>
                 </Decorator>
                 <Decorator ID="TickRateLimiter" hz="10.0" name="">
@@ -115,8 +115,9 @@
             <input_port name="topic_name">Name of the topic to receive planner selection commands</input_port>
         </Action>
         <Action ID="PublishGoal">
-            <input_port default="base_link" name="frame">Frame name to give goal in</input_port>
+            <input_port default="base_link" name="goal_frame">Frame goal pose is defined in</input_port>
             <input_port default="0.0; 0.0;0.0" name="goal_pose">Goal pose vector (x; y; z)</input_port>
+            <input_port default="map" name="publishing_frame">Frame to convert goal into before publishing</input_port>
         </Action>
         <Action ID="PublishString">
             <input_port default="test" name="string_value">String value</input_port>

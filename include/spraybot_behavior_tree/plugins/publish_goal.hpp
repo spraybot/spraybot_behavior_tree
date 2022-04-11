@@ -41,7 +41,9 @@ public:
     return
       {
         BT::InputPort<std::vector<double>>("goal_pose", "Goal pose vector (x; y; yaw)"),
-        BT::InputPort <std::string> ("frame", "map", "Frame name to give goal in")
+        BT::InputPort <std::string> ("goal_frame", "base_link", "Frame goal pose is defined in"),
+        BT::InputPort <std::string> ("publishing_frame", "map", "Frame to convert goal into before publishing")
+
       };
   }
 
@@ -58,6 +60,7 @@ private:
   BT::NodeStatus tick() override;
 
   rclcpp::Node::SharedPtr node_;
+  std::shared_ptr<tf2_ros::Buffer> tf_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
 };
 
