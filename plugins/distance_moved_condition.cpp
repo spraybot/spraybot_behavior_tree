@@ -40,7 +40,6 @@ DistanceMoved::DistanceMoved(
   node_ = config().blackboard->get<rclcpp::Node::SharedPtr>("node");
   tf_ = config().blackboard->get<std::shared_ptr<tf2_ros::Buffer>>("tf_buffer");
   node_->get_parameter("transform_tolerance", transform_tolerance_);
-  RCLCPP_INFO(node_->get_logger(), "Loaded distance condition");
 }
 
 BT::NodeStatus DistanceMoved::tick()

@@ -70,7 +70,7 @@ nav2_util::CallbackReturn Hypervisor::on_configure(const rclcpp_lifecycle::State
 {
   RCLCPP_INFO(logger_, "Configuring %s", node_name_.c_str());
 
-    tf_ = std::make_shared<tf2_ros::Buffer>(get_clock());
+  tf_ = std::make_shared<tf2_ros::Buffer>(get_clock());
   // TODO: (shrijitsingh99) Look into timer interface for tf buffer
   // auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
   //   get_node_base_interface(), get_node_timers_interface());
@@ -90,9 +90,10 @@ nav2_util::CallbackReturn Hypervisor::on_configure(const rclcpp_lifecycle::State
   client_node_ = std::make_shared<rclcpp::Node>("_", options);
 
   // Declare this node's parameters
-  if (!has_parameter("bt_loop_duration")) {
-    declare_parameter("bt_loop_duration", 10);
-  }
+  declare_parameter("bt_loop_duration", 10);
+  declare_parameter("enable_groot_monitoring", true);
+  declare_parameter("groot_publisher_port", 1676);
+  declare_parameter("groot_server_port", 1677);
 
   // Get parameters for BT timeouts
   int timeout;
@@ -119,16 +120,29 @@ nav2_util::CallbackReturn Hypervisor::on_configure(const rclcpp_lifecycle::State
 nav2_util::CallbackReturn Hypervisor::on_activate(const rclcpp_lifecycle::State &)
 {
   RCLCPP_INFO(logger_, "Activating %s", node_name_.c_str());
+
   if (!loadBehaviorTree(default_bt_xml_filename_)) {
     RCLCPP_ERROR(logger_, "Error loading XML file: %s", default_bt_xml_filename_.c_str());
     return nav2_util::CallbackReturn::FAILURE;
   }
+
+
+  bool enable_groot_monitoring;
+  get_parameter("enable_groot_monitoring", enable_groot_monitoring);
+  if (enable_groot_monitoring) {
+    int groot_publisher_port, groot_server_port;
+    get_parameter("groot_publisher_port", groot_publisher_port);
+    get_parameter("groot_server_port", groot_server_port);
+    addGrootMonitoring(tree_, groot_publisher_port, groot_server_port);
+  }
+
   return nav2_util::CallbackReturn::SUCCESS;
 }
 
 nav2_util::CallbackReturn Hypervisor::on_deactivate(const rclcpp_lifecycle::State &)
 {
   RCLCPP_INFO(logger_, "Deactivating %s", node_name_.c_str());
+  resetGrootMonitor();
   return nav2_util::CallbackReturn::SUCCESS;
 }
 
@@ -222,5 +236,25 @@ bool Hypervisor::loadBehaviorTree(const std::string & bt_xml_filename)
 
   current_bt_xml_filename_ = filename;
   return true;
+}
+
+void
+Hypervisor::addGrootMonitoring(
+  BT::Tree & tree,
+  uint16_t publisher_port,
+  uint16_t server_port,
+  uint16_t max_msg_per_second)
+{
+  // This logger publish status changes using ZeroMQ. Used by Groot
+  groot_monitor_ = std::make_unique<BT::PublisherZMQ>(
+    tree, max_msg_per_second, publisher_port, server_port);
+}
+
+void
+Hypervisor::resetGrootMonitor()
+{
+  if (groot_monitor_) {
+    groot_monitor_.reset();
+  }
 }
 }

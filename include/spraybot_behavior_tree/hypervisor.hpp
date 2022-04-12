@@ -111,6 +111,24 @@ public:
     tree_.rootNode()->halt();
   }
 
+  /**
+   * @brief Add groot monitor to publish BT status changes
+   * @param tree BT to monitor
+   * @param publisher_port ZMQ publisher port for the Groot monitor
+   * @param server_port ZMQ server port for the Groot monitor
+   * @param max_msg_per_second Maximum number of messages that can be sent per second
+   */
+  void addGrootMonitoring(
+    BT::Tree & tree,
+    uint16_t publisher_port,
+    uint16_t server_port,
+    uint16_t max_msg_per_second = 25);
+
+  /**
+   * @brief Reset groot monitor
+   */
+  void resetGrootMonitor();
+
 protected:
   // Node name
   std::string node_name_;
@@ -121,6 +139,8 @@ protected:
 
   // The blackboard shared by all of the nodes in the tree
   BT::Blackboard::Ptr blackboard_;
+
+  static inline std::unique_ptr<BT::PublisherZMQ> groot_monitor_;
 
   // The XML file that cointains the Behavior Tree to create
   std::string current_bt_xml_filename_;
