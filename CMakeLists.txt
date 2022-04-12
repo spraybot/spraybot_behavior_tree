@@ -87,6 +87,7 @@ list(APPEND
     loop_until_successful
     tick_rate_limiter
     transition_lifecycle_node
+    distance_moved_condition
 )
 
 foreach(bt_plugin ${plugin_libs})

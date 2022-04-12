@@ -9,12 +9,11 @@
                         <Condition ID="TopicStatus" inital_status="false" topic_name="/exit_status"/>
                         <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/row_detection/change_state" transition_label="deactivate"/>
                         <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/row_exit_detection/change_state" transition_label="deactivate"/>
-                        <Delay delay_msec="10000">
-                            <SequenceStar>
-                                <Action ID="PublishString" string_value="RowTurning" topic_name="/controller_selection"/>
-                                <Action ID="PublishString" string_value="RowTurning" topic_name="/planner_selection"/>
-                            </SequenceStar>
-                        </Delay>
+                        <SequenceStar>
+                            <Condition ID="DistanceMoved" distance="1.5" global_frame="odom" robot_base_frame="base_link"/>
+                            <Action ID="PublishString" string_value="RowTurning" topic_name="/controller_selection"/>
+                            <Action ID="PublishString" string_value="RowTurning" topic_name="/planner_selection"/>
+                        </SequenceStar>
                         <Action ID="PublishGoal" goal_frame="base_link" goal_pose="0.0; -1.5;3.14" publishing_frame="map"/>
                     </SequenceStar>
                 </Decorator>
@@ -66,7 +65,7 @@
         <Decorator ID="DistanceController">
             <input_port name="distance">Distance</input_port>
         </Decorator>
-        <Condition ID="DistanceTraveled">
+        <Condition ID="DistanceMoved">
             <input_port name="distance">Distance to check if passed</input_port>
             <input_port name="global_frame">reference frame to check in</input_port>
             <input_port name="robot_base_frame">Robot frame to check relative to global_frame</input_port>

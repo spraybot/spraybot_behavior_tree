@@ -59,7 +59,8 @@ Hypervisor::Hypervisor(const std::string & node_name)
     "publish_goal_bt_node",
     "loop_until_successful_bt_node",
     "tick_rate_limiter_bt_node",
-    "transition_lifecycle_node_bt_node"
+    "transition_lifecycle_node_bt_node",
+    "distance_moved_condition_bt_node"
   };
 
   declare_parameter("plugin_lib_names", plugin_lib_names_);
