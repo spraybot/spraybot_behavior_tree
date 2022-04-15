@@ -4,7 +4,7 @@
     <BehaviorTree ID="MainTree">
         <Decorator ID="LoopUntilSuccessful" name="">
             <SequenceStar name="">
-                <Decorator ID="TickRateLimiter" hz="10.0">
+                <Decorator ID="TickRateLimiter" hz="50.0">
                     <SequenceStar name="">
                         <Condition ID="TopicStatus" inital_status="false" topic_name="/exit_status"/>
                         <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/row_detection/change_state" transition_label="deactivate"/>
@@ -14,12 +14,13 @@
                             <Action ID="PublishString" string_value="RowTurning" topic_name="/controller_selection"/>
                             <Action ID="PublishString" string_value="RowTurning" topic_name="/planner_selection"/>
                         </SequenceStar>
-                        <Action ID="PublishGoal" goal_frame="base_link" goal_pose="0.0; -1.5;3.14" publishing_frame="map"/>
+                        <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/entrance_detection/change_state" transition_label="activate"/>
                     </SequenceStar>
                 </Decorator>
-                <Decorator ID="TickRateLimiter" hz="10.0" name="">
+                <Decorator ID="TickRateLimiter" hz="50.0" name="">
                     <SequenceStar>
                         <Condition ID="TopicStatus" inital_status="false" name="" topic_name="/entrance_status"/>
+                        <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/entrance_detection/change_state" transition_label="deactivate"/>
                         <SequenceStar>
                             <Action ID="PublishString" name="" string_value="RowFollowing" topic_name="/planner_selection"/>
                             <Action ID="PublishString" string_value="RowFollowing" topic_name="/controller_selection"/>
@@ -176,4 +177,3 @@
     </TreeNodesModel>
     <!-- ////////// -->
 </root>
-
