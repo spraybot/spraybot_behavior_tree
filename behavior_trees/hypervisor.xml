@@ -10,7 +10,7 @@
                         <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/row_detection/change_state" transition_label="deactivate"/>
                         <Action ID="TransitionLifecycleNode" server_timeout="500.0" service_name="/row_exit_detection/change_state" transition_label="deactivate"/>
                         <SequenceStar>
-                            <Condition ID="DistanceMoved" distance="1.5" global_frame="odom" robot_base_frame="base_link"/>
+                            <Condition ID="DistanceMoved" distance="1.0" global_frame="odom" robot_base_frame="base_link"/>
                             <Action ID="PublishString" string_value="RowTurning" topic_name="/controller_selection"/>
                             <Action ID="PublishString" string_value="RowTurning" topic_name="/planner_selection"/>
                         </SequenceStar>
